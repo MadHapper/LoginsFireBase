@@ -21,16 +21,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.loginfirebase.ui.theme.LoginFirebaseTheme
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var callbackManager: CallbackManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +50,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+        callbackManager = CallbackManager.Factory.create()
         setContent {
             LoginFirebaseTheme {
                 // A surface container using the 'background' color from the theme
@@ -49,11 +58,55 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LoginList{ signInWithGoogle() }
+                    LoginList(
+                        onGoogleClick = { signInWithGoogle() },
+                        onFacebookClick = { signInWithFacebook() }
+                    )
                 }
             }
         }
     }
+
+    //facebook
+    private fun signInWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(this, listOf("email", "public_profile"))
+        LoginManager.getInstance().registerCallback(callbackManager, object :
+            FacebookCallback<LoginResult> {
+            override fun onSuccess(result: LoginResult) {
+                firebaseAuthWithFacebook(result.accessToken)
+            }
+
+            override fun onCancel() {
+                // Manejar cancelación
+            }
+
+            override fun onError(error: FacebookException) {
+                // Manejar error
+
+            }
+        })
+    }
+
+    private fun firebaseAuthWithFacebook(accessToken: AccessToken) {
+        val credential = FacebookAuthProvider.getCredential(accessToken.token)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Inicio de sesión exitoso
+                    Toast.makeText(this, "Facebook sign in successful", Toast.LENGTH_LONG).show()
+                } else {
+                    // Si falla el inicio de sesión
+                    Toast.makeText(this, "Facebook sign in failed", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+    fun onActivityResultfacebook(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+    }
+
+
+    //Google
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -92,7 +145,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginList(onGoogleClick: () -> Unit) {
+fun LoginList(onGoogleClick: () -> Unit, onFacebookClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -114,7 +167,7 @@ fun LoginList(onGoogleClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
-                .clickable {  }
+                .clickable { onFacebookClick() }
 
         ) {
             Row(modifier = Modifier.background(Color.Red)) {
@@ -127,7 +180,7 @@ fun LoginList(onGoogleClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
-                .clickable {  }
+                .clickable { }
         ) {
             Row(modifier = Modifier.background(Color.Red)) {
                 Image(painterResource(id = R.drawable.twitter), contentDescription = "")

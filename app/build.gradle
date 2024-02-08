@@ -73,4 +73,8 @@ dependencies {
 
     //Auntenthi Facebook
     implementation 'com.facebook.android:facebook-android-sdk:15.2.0'
+
+    //Firebase noifications
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.4.0'
+
 }
