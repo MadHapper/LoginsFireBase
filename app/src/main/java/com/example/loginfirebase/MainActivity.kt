@@ -10,12 +10,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -100,6 +103,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
     }
+
     fun onActivityResultfacebook(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager.onActivityResult(requestCode, resultCode, data)
@@ -120,7 +124,8 @@ class MainActivity : ComponentActivity() {
                 val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }
@@ -148,55 +153,88 @@ class MainActivity : ComponentActivity() {
 fun LoginList(onGoogleClick: () -> Unit, onFacebookClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
+                .shadow(elevation = 4.dp, shape = RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.LightGray)
+                .padding(10.dp)
                 .clickable { onGoogleClick() }
         ) {
-            Row(modifier = Modifier.background(Color.Red)) {
-                Image(painterResource(id = R.drawable.google), contentDescription = "")
-                Text(text = "login google")
+            Row() {
+                Image(
+                    painterResource(id = R.drawable.google),
+                    contentDescription = "",
+                    modifier = Modifier.size(25.dp)
+                )
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(text = "Login Google")
             }
         }
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
+                .shadow(elevation = 4.dp, shape = RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.LightGray)
+                .padding(10.dp)
                 .clickable { onFacebookClick() }
 
         ) {
-            Row(modifier = Modifier.background(Color.Red)) {
-                Image(painterResource(id = R.drawable.facebook), contentDescription = "")
-                Text(text = "login facebook")
+            Row() {
+                Image(
+                    painterResource(id = R.drawable.facebook),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(text = "Login Facebook")
             }
         }
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
+                .shadow(elevation = 4.dp, shape = RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.LightGray)
+                .padding(10.dp)
                 .clickable { }
         ) {
-            Row(modifier = Modifier.background(Color.Red)) {
-                Image(painterResource(id = R.drawable.twitter), contentDescription = "")
-                Text(text = "login twitter")
+            Row() {
+                Image(
+                    painterResource(id = R.drawable.twitter),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(text = "Login Twitter")
             }
         }
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-                .clickable {  }
+                .padding(16.dp)
+                .shadow(elevation = 4.dp, shape = RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.LightGray)
+                .padding(10.dp)
+                .clickable { }
         ) {
-            Row(modifier = Modifier.background(Color.Red)) {
-                Image(painterResource(id = R.drawable.correo), contentDescription = "")
-                Text(text = "login correo")
+            Row() {
+                Image(
+                    painterResource(id = R.drawable.correo),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
+                )
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(text = "Login Correo")
             }
         }
     }
